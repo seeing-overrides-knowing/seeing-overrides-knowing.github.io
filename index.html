@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>When Seeing Overrides Knowing · Personalized Safety in VLMs</title>
-  <meta name="description" content="MPS-Bench, visual dominance, and PRISM: evaluating and improving personalized safety in vision-language models. COLM 2026.">
+  <meta name="description" content="A benchmark, a failure mode and a fix for personalized safety in vision-language models. COLM 2026.">
   <meta property="og:title" content="When Seeing Overrides Knowing">
   <meta property="og:description" content="Visual Dominance and Deferral-Based Method for Personalized Safety in VLMs. COLM 2026.">
   <meta property="og:image" content="https://seeing-overrides-knowing.github.io/static/img/teaser.webp">
@@ -52,7 +52,6 @@
     <nav class="links">
       <a class="btn primary" href="https://arxiv.org/abs/2609.04281">Paper</a>
       <a class="btn" href="https://arxiv.org/pdf/2609.04281">PDF</a>
-      <a class="btn" href="static/pdf/poster.pdf">Poster</a>
       <a class="btn" href="#bibtex">BibTeX</a>
     </nav>
   </header>
@@ -63,10 +62,105 @@
       <figcaption>Same input, different safety. Images can override what the text says.</figcaption>
     </figure>
 
+    <section class="intro">
+      <p>
+        Ask a vision-language model whether the dish in a photo is fine for lunch and it will usually say yes.
+        That answer works for most people and could send someone with a nut allergy to the hospital. The model
+        cannot see who is asking, so a safe model has to notice when the missing context matters and ask before
+        it answers. We call this <b>personalized safety</b> and study it in models that see images as well as text.
+      </p>
+    </section>
+
     <section class="stats">
       <div><strong>86–99%</strong><span>answer directly instead of asking</span></div>
       <div><strong>≤ 2.6 / 5</strong><span>safety without user context</span></div>
       <div><strong>0.95–0.98</strong><span>AUROC with PRISM</span></div>
+    </section>
+
+    <section>
+      <h2>MPS-Bench</h2>
+      <p>
+        MPS-Bench pairs 584 real user images with questions across 12 high-risk domains, from health and finance
+        to caregiving. Every scenario comes with a hidden user profile covering things like age, health, emotional
+        state and substance use. The model only sees the image and the question. The judge sees the full profile
+        and scores the answer on five safety dimensions. We also vary the tone of the image and of the text, which
+        lets us see which one the model actually listens to.
+      </p>
+      <p class="chips"><span>5,181 scenarios</span><span>584 real images</span><span>12 high-risk domains</span><span>5 safety dimensions</span></p>
+      <figure><img src="static/img/pipeline.webp" alt="MPS-Bench construction and evaluation pipeline" width="2000" height="836"></figure>
+    </section>
+
+    <section>
+      <h2>VLMs rarely ask for context</h2>
+      <p>
+        When important context is missing, the safe move is often a quick follow-up question. Models almost never
+        do this. They answer directly <b class="hl">86 to 99 percent</b> of the time, and models that reason
+        before answering are no more careful.
+      </p>
+      <figure class="narrow"><img src="static/img/asking.webp" alt="Direct response vs asking rates across VLMs" width="2000" height="1388"></figure>
+    </section>
+
+    <section>
+      <h2>Direct answers are unsafe</h2>
+      <p>
+        Those direct answers score poorly. Without the user profile, no model gets above <b class="hl">2.6 out
+        of 5</b> in any domain. Give the same models the profile and every one of them does much better. The
+        ability is there. What the models lack is the sense that something important is missing.
+      </p>
+      <figure><img src="static/img/radar.webp" alt="Safety scores by domain, generic vs personalized" width="2000" height="954"></figure>
+    </section>
+
+    <section>
+      <h2>Visual dominance</h2>
+      <p>
+        Changing the tone of the image moves safety scores far more than changing the tone of the question. A
+        grim photo makes models cautious however the question is worded, while a pleasant photo can make a risky
+        question look harmless. We call this <b class="hl">visual dominance</b>, and it holds for every model we
+        tested.
+      </p>
+      <div class="grid2">
+        <figure><img src="static/img/modality.webp" alt="Safety score swing from image vs text tone" width="2000" height="1503"><figcaption>Image tone matters more than text tone</figcaption></figure>
+        <figure><img src="static/img/tone.webp" alt="Safety score by text tone for each image tone" width="2000" height="1375"><figcaption>Negative images raise caution at every text tone</figcaption></figure>
+      </div>
+    </section>
+
+    <section>
+      <h2>Where it happens inside the model</h2>
+      <p>
+        To find the source, we feed Gemma-3 4B and 12B 2,000 paired inputs that share the same question and differ
+        only in the image, then patch individual attention edges. The image effect reaches the final decision
+        mostly through the <em>text</em> tokens, carrying <b class="hl">2.1 to 2.3 times</b> more of it than the
+        image tokens do. The picture gets written into the text early in the network and read back out near the
+        end. Because the mixing starts so early, patching late layers cannot cleanly undo it.
+      </p>
+      <div class="flow">
+        <span class="node warm">Image tokens</span>
+        <span class="edge">Transfer<small>early–mid layers</small></span>
+        <span class="node">Text tokens</span>
+        <span class="edge">Execution<small>late layers</small></span>
+        <span class="node">Final decision</span>
+      </div>
+      <div class="grid3">
+        <figure><img src="static/img/edge.webp" alt="Text edges carry 2.1 to 2.3 times more of the image effect" width="2000" height="1249"><figcaption>Text edges carry most of the image effect</figcaption></figure>
+        <figure><img src="static/img/handoff12b.webp" alt="Causal hand-off in Gemma-3-12B" width="2000" height="1287"><figcaption>Gemma-3 12B</figcaption></figure>
+        <figure><img src="static/img/handoff4b.webp" alt="Causal hand-off in Gemma-3-4B" width="2000" height="1208"><figcaption>Gemma-3 4B</figcaption></figure>
+      </div>
+    </section>
+
+    <section>
+      <h2>PRISM knows when to defer</h2>
+      <p>
+        Since the model cannot reliably fix this on its own, PRISM checks the input before the model answers. It
+        is a small module (10 to 20M trainable parameters) on top of frozen image and text encoders. Each modality
+        reweights the features of the other, so risk cues in the text are not drowned out by the image. When
+        PRISM decides a question needs more context, the assistant asks the user first.
+      </p>
+      <p>
+        PRISM reaches <b class="hl">0.95 to 0.98 AUROC</b> across four encoders, well above VLM judges
+        (0.76 to 0.82) and linear probes (0.67 to 0.79). It also gives the lowest unsafe exposure at every
+        deferral rate, so it catches risky questions without deferring on everything.
+      </p>
+      <figure><img src="static/img/prism.webp" alt="PRISM safety-utility Pareto frontier and AUROC by method" width="2000" height="918"></figure>
     </section>
 
     <section>
@@ -79,72 +173,14 @@
         each paired with a hidden user profile. Evaluating eight frontier VLMs, we find that they almost always
         respond directly (86–99%) rather than seek missing context, and none exceeds 2.6/5 on personalized safety.
         To understand why these failures arise, we analyze multimodal interactions and identify <em>visual
-        dominance</em>: visual information enters text representations early and suppresses textual risk signals
-        during multimodal fusion. Causal interventions reveal a two-stage mechanism in which visual affect is first
-        transferred into the text stream in early layers and then shapes the final decision through this altered
-        text representation, making late-stage internal remediation unreliable. Motivated by this mechanism, we
-        propose PRISM, a lightweight input monitor that uses bidirectional cross-modal modulation to predict when a
+        dominance</em>, where visual information enters text representations early and suppresses textual risk
+        signals during multimodal fusion. Causal interventions reveal a two-stage mechanism in which visual affect is
+        first transferred into the text stream in early layers and then shapes the final decision through this
+        altered text representation, making late-stage internal remediation unreliable. Motivated by this mechanism,
+        we propose PRISM, a lightweight input monitor that uses bidirectional cross-modal modulation to predict when a
         query is likely to require deferral. PRISM achieves 0.978 AUC and strictly dominates the safety–utility
         Pareto frontier across all tested models.
       </p>
-    </section>
-
-    <section>
-      <h2>MPS-Bench</h2>
-      <p class="lead">Image + query + <b>hidden user profile</b>. The model sees only image + query.</p>
-      <p class="chips"><span>5,181 scenarios</span><span>584 real images</span><span>12 high-risk domains</span><span>5 safety dimensions</span></p>
-      <figure><img src="static/img/pipeline.webp" alt="MPS-Bench construction and evaluation pipeline" width="2000" height="836"></figure>
-    </section>
-
-    <section>
-      <h2>VLMs rarely ask for context</h2>
-      <p class="lead"><b class="hl">86–99%</b> answer directly. Reasoning does not help.</p>
-      <figure class="narrow"><img src="static/img/asking.webp" alt="Direct response vs asking rates across VLMs" width="2000" height="1388"></figure>
-    </section>
-
-    <section>
-      <h2>Direct answers are unsafe</h2>
-      <p class="lead">No model exceeds <b class="hl">2.6 / 5</b> without user context.</p>
-      <figure><img src="static/img/radar.webp" alt="Safety scores by domain, generic vs personalized" width="2000" height="954"></figure>
-    </section>
-
-    <section>
-      <h2>Visual dominance</h2>
-      <p class="lead">Image tone moves safety <b class="hl">far more</b> than text tone. Benign images <b class="hl">mask risky text</b>.</p>
-      <div class="grid2">
-        <figure><img src="static/img/modality.webp" alt="Safety score swing from image vs text tone" width="2000" height="1503"></figure>
-        <figure><img src="static/img/tone.webp" alt="Safety score by text tone for each image tone" width="2000" height="1375"></figure>
-      </div>
-    </section>
-
-    <section>
-      <h2>Two-stage mechanism</h2>
-      <p class="lead">Image enters text <b class="hl">early</b> and steers the decision <b class="hl">late</b>. Late fixes cannot undo early fusion.</p>
-      <div class="flow">
-        <span class="node warm">Image tokens</span>
-        <span class="edge">Transfer<small>early–mid layers</small></span>
-        <span class="node">Text tokens</span>
-        <span class="edge">Execution<small>late layers</small></span>
-        <span class="node">Final decision</span>
-      </div>
-      <div class="grid3">
-        <figure><img src="static/img/edge.webp" alt="Text edges carry 2.1 to 2.3 times more of the image effect" width="2000" height="1249"><figcaption>Text edges carry 2.1–2.3× more of the image effect</figcaption></figure>
-        <figure><img src="static/img/handoff12b.webp" alt="Causal hand-off in Gemma-3-12B" width="2000" height="1287"><figcaption>Gemma-3 12B</figcaption></figure>
-        <figure><img src="static/img/handoff4b.webp" alt="Causal hand-off in Gemma-3-4B" width="2000" height="1208"><figcaption>Gemma-3 4B</figcaption></figure>
-      </div>
-    </section>
-
-    <section>
-      <h2>PRISM knows when to defer</h2>
-      <p class="lead">A lightweight input monitor that flags queries needing user context <b>before</b> answering.</p>
-      <p class="chips"><span>0.95–0.98 AUROC</span><span>10–20M trainable params</span><span>4 encoder backbones</span></p>
-      <figure><img src="static/img/prism.webp" alt="PRISM safety-utility Pareto frontier and AUROC by method" width="2000" height="918"></figure>
-      <p class="caption">Lowest unsafe exposure at every deferral rate. Beats VLM judges and linear probes.</p>
-    </section>
-
-    <section>
-      <h2>Poster</h2>
-      <a class="poster" href="static/pdf/poster.pdf"><img src="static/img/poster.webp" alt="COLM 2026 poster" width="2400" height="1800"></a>
     </section>
 
     <section id="bibtex">
@@ -166,7 +202,7 @@
   </main>
 
   <footer>
-    <p>Contact: <a href="mailto:edwardsun12895@g.ucla.edu">edwardsun12895@g.ucla.edu</a> · <a href="mailto:yuchenw@uw.edu">yuchenw@uw.edu</a></p>
+    <p>Questions? Email <a href="mailto:edwardsun12895@g.ucla.edu">edwardsun12895@g.ucla.edu</a> or <a href="mailto:yuchenw@uw.edu">yuchenw@uw.edu</a></p>
   </footer>
 
   <script>

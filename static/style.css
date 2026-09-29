@@ -125,6 +125,9 @@ h2 {
 }
 
 .lead { margin: 0 0 18px; font-size: 20px; line-height: 1.5; }
+section > p { margin: 0 0 18px; color: #3a414b; }
+.intro { padding-top: 40px; }
+.intro p { margin: 0 auto; max-width: 760px; color: var(--ink); font-size: 20px; line-height: 1.6; text-align: center; }
 .hl { color: var(--blue); }
 
 .abstract { margin: 0; color: #3a414b; text-align: justify; hyphens: auto; }
