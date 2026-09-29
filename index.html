@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>When Seeing Overrides Knowing · Personalized Safety in VLMs</title>
+  <meta name="description" content="MPS-Bench, visual dominance, and PRISM: evaluating and improving personalized safety in vision-language models. COLM 2026.">
+  <meta property="og:title" content="When Seeing Overrides Knowing">
+  <meta property="og:description" content="Visual Dominance and Deferral-Based Method for Personalized Safety in VLMs. COLM 2026.">
+  <meta property="og:image" content="https://seeing-overrides-knowing.github.io/static/img/teaser.webp">
+  <meta property="og:url" content="https://seeing-overrides-knowing.github.io/">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%232774AE'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%23FFD100'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+  <header class="hero">
+    <p class="venue">COLM 2026</p>
+    <h1>When Seeing Overrides Knowing</h1>
+    <p class="subtitle">Visual Dominance and Deferral-Based Method for Personalized Safety in VLMs</p>
+
+    <p class="authors">
+      <span>Edward Sun<sup>1*</sup></span>
+      <span>Yuchen Wu<sup>2*</sup></span>
+      <span>Zixian Ma<sup>2</sup></span>
+      <span>Eric Hanchen Jiang<sup>1</sup></span>
+      <span>Yijia Xiao<sup>1</sup></span>
+      <span>Xiaoyuan Yi<sup>3</sup></span>
+      <span>Ranjay Krishna<sup>2</sup></span>
+      <span>Wei Wang<sup>1</sup></span>
+      <span>Jindong Wang<sup>4†</sup></span>
+      <span>Aylin Caliskan<sup>2†</sup></span>
+    </p>
+    <p class="affils">
+      <span><sup>1</sup>University of California, Los Angeles</span>
+      <span><sup>2</sup>University of Washington</span>
+      <span><sup>3</sup>Microsoft Research Asia</span>
+      <span><sup>4</sup>William &amp; Mary</span>
+    </p>
+    <p class="notes"><sup>*</sup>Equal contribution &nbsp;&nbsp; <sup>†</sup>Corresponding authors</p>
+
+    <div class="logos">
+      <img class="l-ucla" src="static/img/logo_ucla.png" alt="UCLA">
+      <img class="l-uw" src="static/img/logo_uw.png" alt="University of Washington">
+      <img class="l-ms" src="static/img/logo_ms.png" alt="Microsoft">
+      <img class="l-wm" src="static/img/logo_wm.png" alt="William &amp; Mary">
+    </div>
+
+    <nav class="links">
+      <a class="btn primary" href="https://arxiv.org/abs/2609.04281">Paper</a>
+      <a class="btn" href="https://arxiv.org/pdf/2609.04281">PDF</a>
+      <a class="btn" href="static/pdf/poster.pdf">Poster</a>
+      <a class="btn" href="#bibtex">BibTeX</a>
+    </nav>
+  </header>
+
+  <main>
+    <figure class="teaser">
+      <img src="static/img/teaser.webp" alt="Same image and query, different users, different safety. A benign image can override risky text." width="2000" height="2193">
+      <figcaption>Same input, different safety. Images can override what the text says.</figcaption>
+    </figure>
+
+    <section class="stats">
+      <div><strong>86–99%</strong><span>answer directly instead of asking</span></div>
+      <div><strong>≤ 2.6 / 5</strong><span>safety without user context</span></div>
+      <div><strong>0.95–0.98</strong><span>AUROC with PRISM</span></div>
+    </section>
+
+    <section>
+      <h2>Abstract</h2>
+      <p class="abstract">
+        Vision-language models (VLMs) are increasingly deployed in high-stakes settings, where a response that is
+        reasonable in general may still be unsafe for a particular user whose medical, emotional, or situational
+        context is unknown to the model. We study this problem of personalized safety in multimodal systems and
+        introduce MPS-Bench, a benchmark of 5,181 scenarios from 584 real-world images across 12 high-risk domains,
+        each paired with a hidden user profile. Evaluating eight frontier VLMs, we find that they almost always
+        respond directly (86–99%) rather than seek missing context, and none exceeds 2.6/5 on personalized safety.
+        To understand why these failures arise, we analyze multimodal interactions and identify <em>visual
+        dominance</em>: visual information enters text representations early and suppresses textual risk signals
+        during multimodal fusion. Causal interventions reveal a two-stage mechanism in which visual affect is first
+        transferred into the text stream in early layers and then shapes the final decision through this altered
+        text representation, making late-stage internal remediation unreliable. Motivated by this mechanism, we
+        propose PRISM, a lightweight input monitor that uses bidirectional cross-modal modulation to predict when a
+        query is likely to require deferral. PRISM achieves 0.978 AUC and strictly dominates the safety–utility
+        Pareto frontier across all tested models.
+      </p>
+    </section>
+
+    <section>
+      <h2>MPS-Bench</h2>
+      <p class="lead">Image + query + <b>hidden user profile</b>. The model sees only image + query.</p>
+      <p class="chips"><span>5,181 scenarios</span><span>584 real images</span><span>12 high-risk domains</span><span>5 safety dimensions</span></p>
+      <figure><img src="static/img/pipeline.webp" alt="MPS-Bench construction and evaluation pipeline" width="2000" height="836"></figure>
+    </section>
+
+    <section>
+      <h2>VLMs rarely ask for context</h2>
+      <p class="lead"><b class="hl">86–99%</b> answer directly. Reasoning does not help.</p>
+      <figure class="narrow"><img src="static/img/asking.webp" alt="Direct response vs asking rates across VLMs" width="2000" height="1388"></figure>
+    </section>
+
+    <section>
+      <h2>Direct answers are unsafe</h2>
+      <p class="lead">No model exceeds <b class="hl">2.6 / 5</b> without user context.</p>
+      <figure><img src="static/img/radar.webp" alt="Safety scores by domain, generic vs personalized" width="2000" height="954"></figure>
+    </section>
+
+    <section>
+      <h2>Visual dominance</h2>
+      <p class="lead">Image tone moves safety <b class="hl">far more</b> than text tone. Benign images <b class="hl">mask risky text</b>.</p>
+      <div class="grid2">
+        <figure><img src="static/img/modality.webp" alt="Safety score swing from image vs text tone" width="2000" height="1503"></figure>
+        <figure><img src="static/img/tone.webp" alt="Safety score by text tone for each image tone" width="2000" height="1375"></figure>
+      </div>
+    </section>
+
+    <section>
+      <h2>Two-stage mechanism</h2>
+      <p class="lead">Image enters text <b class="hl">early</b> and steers the decision <b class="hl">late</b>. Late fixes cannot undo early fusion.</p>
+      <div class="flow">
+        <span class="node warm">Image tokens</span>
+        <span class="edge">Transfer<small>early–mid layers</small></span>
+        <span class="node">Text tokens</span>
+        <span class="edge">Execution<small>late layers</small></span>
+        <span class="node">Final decision</span>
+      </div>
+      <div class="grid3">
+        <figure><img src="static/img/edge.webp" alt="Text edges carry 2.1 to 2.3 times more of the image effect" width="2000" height="1249"><figcaption>Text edges carry 2.1–2.3× more of the image effect</figcaption></figure>
+        <figure><img src="static/img/handoff12b.webp" alt="Causal hand-off in Gemma-3-12B" width="2000" height="1287"><figcaption>Gemma-3 12B</figcaption></figure>
+        <figure><img src="static/img/handoff4b.webp" alt="Causal hand-off in Gemma-3-4B" width="2000" height="1208"><figcaption>Gemma-3 4B</figcaption></figure>
+      </div>
+    </section>
+
+    <section>
+      <h2>PRISM knows when to defer</h2>
+      <p class="lead">A lightweight input monitor that flags queries needing user context <b>before</b> answering.</p>
+      <p class="chips"><span>0.95–0.98 AUROC</span><span>10–20M trainable params</span><span>4 encoder backbones</span></p>
+      <figure><img src="static/img/prism.webp" alt="PRISM safety-utility Pareto frontier and AUROC by method" width="2000" height="918"></figure>
+      <p class="caption">Lowest unsafe exposure at every deferral rate. Beats VLM judges and linear probes.</p>
+    </section>
+
+    <section>
+      <h2>Poster</h2>
+      <a class="poster" href="static/pdf/poster.pdf"><img src="static/img/poster.webp" alt="COLM 2026 poster" width="2400" height="1800"></a>
+    </section>
+
+    <section id="bibtex">
+      <h2>BibTeX</h2>
+      <div class="bib">
+        <button type="button" class="copy" aria-label="Copy BibTeX">Copy</button>
+<pre><code id="bib">@inproceedings{sun2026seeing,
+  title     = {When Seeing Overrides Knowing: Visual Dominance and Deferral-Based
+               Method for Personalized Safety in VLMs},
+  author    = {Sun, Edward and Wu, Yuchen and Ma, Zixian and Jiang, Eric Hanchen and
+               Xiao, Yijia and Yi, Xiaoyuan and Krishna, Ranjay and Wang, Wei and
+               Wang, Jindong and Caliskan, Aylin},
+  booktitle = {Conference on Language Modeling (COLM)},
+  year      = {2026},
+  url       = {https://arxiv.org/abs/2609.04281}
+}</code></pre>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Contact: <a href="mailto:edwardsun12895@g.ucla.edu">edwardsun12895@g.ucla.edu</a> · <a href="mailto:yuchenw@uw.edu">yuchenw@uw.edu</a></p>
+  </footer>
+
+  <script>
+    document.querySelector(".copy").addEventListener("click", async (e) => {
+      await navigator.clipboard.writeText(document.getElementById("bib").textContent);
+      e.target.textContent = "Copied";
+      setTimeout(() => (e.target.textContent = "Copy"), 1500);
+    });
+  </script>
+</body>
+</html>

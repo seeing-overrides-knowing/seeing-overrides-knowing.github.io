@@ -1,0 +1,242 @@
+/* UCLA palette: Blue #2774AE, Darker Blue #005587, Gold #FFD100 */
+:root {
+  --blue: #2774ae;
+  --navy: #005587;
+  --gold: #ffd100;
+  --ink: #222831;
+  --muted: #5f6b7a;
+  --line: #e3e8ee;
+  --tint: #eef5fc;
+  --max: 980px;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background: #fff;
+  font: 400 17px/1.65 Inter, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+img { display: block; max-width: 100%; height: auto; }
+
+/* ---------------------------------------------------------------- hero */
+.hero {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 72px 24px 40px;
+  text-align: center;
+  border-bottom: 1px solid var(--line);
+}
+
+.venue {
+  display: inline-block;
+  margin: 0 0 18px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--tint);
+  color: var(--navy);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+h1 {
+  margin: 0;
+  color: var(--blue);
+  font-size: clamp(34px, 6vw, 58px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  margin: 12px auto 0;
+  max-width: 760px;
+  color: var(--navy);
+  font-size: clamp(19px, 2.6vw, 25px);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.authors {
+  margin: 30px auto 6px;
+  max-width: 820px;
+  font-size: 17px;
+  font-weight: 500;
+}
+.authors span { display: inline-block; margin: 0 9px; white-space: nowrap; }
+
+.affils, .notes { margin: 4px 0; color: var(--muted); font-size: 15px; }
+.affils span { display: inline-block; margin: 0 10px; white-space: nowrap; }
+.notes { font-size: 13px; }
+sup { font-size: 0.68em; line-height: 0; }
+
+.logos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 18px 44px;
+  margin: 34px 0 30px;
+}
+.logos img { width: auto; }
+.logos .l-ucla { height: 46px; }
+.logos .l-uw { height: 56px; }
+.logos .l-ms { height: 34px; }
+.logos .l-wm { height: 50px; }
+
+.links { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+
+.btn {
+  padding: 9px 22px;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 600;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+.btn:hover { border-color: var(--blue); color: var(--blue); text-decoration: none; }
+.btn.primary { background: var(--blue); border-color: var(--blue); color: #fff; }
+.btn.primary:hover { background: var(--navy); border-color: var(--navy); color: #fff; }
+
+/* ---------------------------------------------------------------- content */
+main { max-width: var(--max); margin: 0 auto; padding: 0 24px; }
+
+section { padding: 56px 0 8px; }
+
+h2 {
+  display: inline-block;
+  margin: 0 0 14px;
+  padding-bottom: 6px;
+  border-bottom: 3px solid var(--gold);
+  color: var(--navy);
+  font-size: 27px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.lead { margin: 0 0 18px; font-size: 20px; line-height: 1.5; }
+.hl { color: var(--blue); }
+
+.abstract { margin: 0; color: #3a414b; text-align: justify; hyphens: auto; }
+
+figure { margin: 0; }
+figure img { width: 100%; }
+figcaption, .caption { margin-top: 10px; color: var(--muted); font-size: 15px; text-align: center; }
+
+.teaser { max-width: 640px; margin: 48px auto 0; }
+
+.narrow { max-width: 760px; margin: 0 auto; }
+
+.grid2, .grid3 { display: grid; gap: 22px; align-items: start; }
+.grid2 { grid-template-columns: 1fr 1fr; }
+.grid3 { grid-template-columns: 1fr 1fr 1fr; margin-top: 26px; }
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  padding-top: 44px;
+}
+.stats div {
+  padding: 22px 16px;
+  border-radius: 14px;
+  background: var(--tint);
+  text-align: center;
+}
+.stats strong { display: block; color: var(--blue); font-size: 32px; font-weight: 800; line-height: 1.1; }
+.stats span { display: block; margin-top: 6px; color: var(--muted); font-size: 15px; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 22px; }
+.chips span {
+  padding: 4px 13px;
+  border-radius: 999px;
+  background: var(--tint);
+  color: var(--navy);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.flow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 8px 0 0;
+}
+.node {
+  padding: 12px 18px;
+  border-radius: 10px;
+  background: var(--tint);
+  color: var(--navy);
+  font-weight: 700;
+}
+.node.warm { background: #fff8db; }
+.edge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 120px;
+  color: var(--blue);
+  font-size: 14px;
+  font-weight: 700;
+}
+.edge::before { content: "→"; font-size: 22px; line-height: 1; }
+.edge small { color: var(--muted); font-size: 12.5px; font-weight: 500; }
+
+.poster img { border: 1px solid var(--line); border-radius: 10px; transition: box-shadow 0.2s; }
+.poster:hover img { box-shadow: 0 8px 30px rgba(0, 85, 135, 0.12); }
+
+.bib { position: relative; }
+.bib pre {
+  margin: 0;
+  padding: 20px 22px;
+  overflow-x: auto;
+  border-radius: 12px;
+  background: #f6f8fa;
+  font: 13.5px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.copy {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 4px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--muted);
+  font: 600 13px Inter, system-ui, sans-serif;
+  cursor: pointer;
+}
+.copy:hover { color: var(--blue); border-color: var(--blue); }
+
+footer {
+  max-width: var(--max);
+  margin: 64px auto 0;
+  padding: 26px 24px 48px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+@media (max-width: 720px) {
+  .hero { padding-top: 48px; }
+  .grid2, .grid3, .stats { grid-template-columns: 1fr; }
+  .logos .l-ucla { height: 34px; }
+  .logos .l-uw { height: 40px; }
+  .logos .l-ms { height: 25px; }
+  .logos .l-wm { height: 36px; }
+  .lead { font-size: 18px; }
+  .abstract { text-align: left; }
+}
