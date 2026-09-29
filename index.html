@@ -127,11 +127,9 @@
     <section>
       <h2>Where it happens inside the model</h2>
       <p>
-        To find the source, we feed Gemma-3 4B and 12B 2,000 paired inputs that share the same question and differ
-        only in the image, then patch individual attention edges. The image effect reaches the final decision
-        mostly through the <em>text</em> tokens, carrying <b class="hl">2.1 to 2.3 times</b> more of it than the
-        image tokens do. The picture gets written into the text early in the network and read back out near the
-        end. Because the mixing starts so early, patching late layers cannot cleanly undo it.
+        Patching attention edges in Gemma-3 on 2,000 image-swap pairs shows how this happens. The image is
+        written into the text tokens early in the network, and the final decision reads it from there. Text
+        edges carry <b class="hl">2.1 to 2.3 times</b> more of the image effect than image edges do.
       </p>
       <div class="flow">
         <span class="node warm">Image tokens</span>
@@ -140,18 +138,16 @@
         <span class="edge">Execution<small>late layers</small></span>
         <span class="node">Final decision</span>
       </div>
-      <div class="grid3">
+      <div class="grid2 compact">
         <figure><img src="static/img/edge.webp" alt="Text edges carry 2.1 to 2.3 times more of the image effect" width="2000" height="1249"><figcaption>Text edges carry most of the image effect</figcaption></figure>
-        <figure><img src="static/img/handoff12b.webp" alt="Causal hand-off in Gemma-3-12B" width="2000" height="1287"><figcaption>Gemma-3 12B</figcaption></figure>
-        <figure><img src="static/img/handoff4b.webp" alt="Causal hand-off in Gemma-3-4B" width="2000" height="1208"><figcaption>Gemma-3 4B</figcaption></figure>
+        <figure><img src="static/img/handoff12b.webp" alt="Causal hand-off in Gemma-3-12B" width="2000" height="1287"><figcaption>Image enters text early, decision reads it late</figcaption></figure>
       </div>
     </section>
 
     <section>
       <h2>PRISM knows when to defer</h2>
       <p>
-        Since the model cannot reliably fix this on its own, PRISM checks the input before the model answers. It
-        is a small module (10 to 20M trainable parameters) on top of frozen image and text encoders. Each modality
+        PRISM is a cheap input filter that runs before the model answers. It is a small module (10 to 20M trainable parameters) on top of frozen image and text encoders. Each modality
         reweights the features of the other, so risk cues in the text are not drowned out by the image. When
         PRISM decides a question needs more context, the assistant asks the user first.
       </p>
